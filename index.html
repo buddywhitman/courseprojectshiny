@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>mtcars MPG Predictor App - Reproducible Pitch Presentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7f6;
+      color: #333;
+    }
+    .slide-container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 40px;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .slide {
+      display: none;
+    }
+    .slide.active {
+      display: block;
+    }
+    h1, h2, h3 {
+      color: #1a365d;
+    }
+    h2 {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+    pre, code {
+      background: #edf2f7;
+      border-radius: 4px;
+      font-family: "Courier New", Courier, monospace;
+    }
+    pre {
+      padding: 12px;
+      overflow-x: auto;
+      font-size: 0.9em;
+    }
+    code {
+      padding: 2px 6px;
+    }
+    ul, ol {
+      line-height: 1.6;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .btn {
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: bold;
+    }
+    .btn:disabled {
+      background-color: #cbd5e0;
+      cursor: not-allowed;
+    }
+    .slide-num {
+      font-weight: bold;
+      color: #718096;
+    }
+    a {
+      color: #3182ce;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide-container">
+  
+  <!-- Slide 1 -->
+  <div class="slide active">
+    <h2>1. Executive Summary & Overview</h2>
+    <h3>mtcars MPG Predictor & Performance Explorer</h3>
+    <p><strong>Developing Data Products Pitch Presentation</strong></p>
+    <p><em>Author: Buddy Whitman</em></p>
+    <hr>
+    <h4>The Problem & Solution</h4>
+    <p>Vehicle fuel efficiency (Miles Per Gallon - MPG) depends on multiple mechanical specifications. Estimating expected fuel consumption helps drivers and buyers assess automotive economy and performance.</p>
+    <ul>
+      <li><strong>Objective:</strong> Deliver an intuitive, interactive tool to predict fuel efficiency based on custom vehicle parameters.</li>
+      <li><strong>Data Source:</strong> 1974 <em>Motor Trend</em> US magazine dataset (<code>mtcars</code>).</li>
+      <li><strong>Interactive Application:</strong> Built with R Shiny, allowing users to manipulate sliders and radio buttons for real-time MPG estimation.</li>
+    </ul>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide">
+    <h2>2. The mtcars Dataset & Exploratory Analysis</h2>
+    <p>The <code>mtcars</code> dataset comprises fuel consumption and 10 aspects of automobile design for 32 automobiles (1973–74 models).</p>
+    <p><strong>Embedded R Output (Dataset Summary):</strong></p>
+    <pre><code>> summary(mtcars[, c("mpg", "hp", "wt", "cyl", "am")])
+      mpg              hp              wt             cyl             am        
+ Min.   :10.40   Min.   : 52.0   Min.   :1.513   Min.   :4.000   Min.   :0.0000  
+ 1st Qu.:15.43   1st Qu.: 96.5   1st Qu.:2.581   1st Qu.:4.000   1st Qu.:0.0000  
+ Median :19.20   Median :123.0   Median :3.325   Median :6.000   Median :0.0000  
+ Mean   :20.09   Mean   :146.7   Mean   :3.217   Mean   :6.188   Mean   :0.4062  
+ 3rd Qu.:22.80   3rd Qu.:180.0   3rd Qu.:3.610   3rd Qu.:8.000   3rd Qu.:1.0000  
+ Max.   :33.90   Max.   :335.0   Max.   :5.424   Max.   :8.000   Max.   :1.0000  </code></pre>
+    <ul>
+      <li>Key Predictors used in our model: <strong>Horsepower (hp)</strong>, <strong>Weight (wt)</strong>, <strong>Cylinders (cyl)</strong>, and <strong>Transmission (am)</strong>.</li>
+    </ul>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide">
+    <h2>3. Predictive Statistical Model</h2>
+    <p>We fit a multivariate linear regression model to compute predicted MPG dynamically inside <code>server.R</code>:</p>
+    <pre><code>> fit <- lm(mpg ~ hp + wt + factor(cyl) + factor(am), data = mtcars)
+> coef(summary(fit))
+                Estimate Std. Error   t value     Pr(>|t|)
+(Intercept)  33.70832390 2.60488618 12.940421 7.733392e-13
+hp           -0.03210943 0.01369257 -2.345025 2.693461e-02
+wt           -2.49682942 0.88558779 -2.819404 9.081408e-03
+factor(cyl)6 -3.03134449 1.40728351 -2.154040 4.068272e-02
+factor(cyl)8 -2.16367532 2.28425172 -0.947214 3.522509e-01
+factor(am)1   1.80921138 1.39630450  1.295714 2.064597e-01</code></pre>
+    <ul>
+      <li><strong>Insight:</strong> Higher horsepower and weight significantly reduce fuel efficiency.</li>
+      <li>The reactive expression updates predictions instantly as widget values are changed.</li>
+    </ul>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide">
+    <h2>4. Visualizing Model Performance</h2>
+    <p>The application renders an interactive scatter plot comparing user inputs against historical data:</p>
+    <pre><code>> ggplot(mtcars, aes(x = hp, y = mpg, color = factor(cyl))) +
++   geom_point(size = 3) +
++   geom_smooth(method = "lm", se = FALSE, color = "gray50", linetype = "dashed") +
++   theme_minimal()</code></pre>
+    <div style="text-align: center; margin-top: 10px;">
+      <svg width="450" height="200" style="background: #fff; border: 1px solid #cbd5e0;">
+        <text x="225" y="30" text-anchor="middle" font-weight="bold" fill="#2d3748">MPG vs Horsepower by Cylinder Count</text>
+        <line x1="50" y1="160" x2="400" y2="160" stroke="#718096" stroke-width="2"/>
+        <line x1="50" y1="40" x2="50" y2="160" stroke="#718096" stroke-width="2"/>
+        <circle cx="80" cy="60" r="5" fill="#3182ce"/>
+        <circle cx="120" cy="80" r="5" fill="#3182ce"/>
+        <circle cx="180" cy="110" r="5" fill="#dd6b20"/>
+        <circle cx="250" cy="130" r="5" fill="#e53e3e"/>
+        <circle cx="320" cy="145" r="5" fill="#e53e3e"/>
+        <line x1="60" y1="50" x2="350" y2="150" stroke="#a0aec0" stroke-width="2" stroke-dasharray="4"/>
+        <text x="210" y="100" fill="#e53e3e" font-weight="bold">★ Custom Prediction</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Slide 5 -->
+  <div class="slide">
+    <h2>5. Shiny Application Link & Repository</h2>
+    <h3>Explore the Live Application & Source Code</h3>
+    <ul>
+      <li><strong>Shiny Application URL:</strong><br>
+        <a href="https://buddywhitman.shinyapps.io/courseprojectshiny/" target="_blank">https://buddywhitman.shinyapps.io/courseprojectshiny/</a>
+      </li>
+      <br>
+      <li><strong>GitHub Repository:</strong><br>
+        <a href="https://github.com/buddywhitman/courseprojectshiny" target="_blank">https://github.com/buddywhitman/courseprojectshiny</a>
+      </li>
+      <br>
+      <li><strong>Key App Features:</strong>
+        <ol>
+          <li>Multiple input widgets (sliders for HP/Weight, radio buttons for Cylinders/Transmission).</li>
+          <li>Reactive calculations in <code>server.R</code> updating outputs in real time.</li>
+          <li>Comprehensive inline documentation tab on the Shiny app itself.</li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)" disabled>Previous</button>
+    <span class="slide-num" id="slideNum">Slide 1 of 5</span>
+    <button class="btn" id="nextBtn" onclick="changeSlide(1)">Next</button>
+  </div>
+
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const slideNum = document.getElementById('slideNum');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function changeSlide(direction) {
+    slides[currentSlide].classList.remove('active');
+    currentSlide += direction;
+    slides[currentSlide].classList.add('active');
+
+    slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+    prevBtn.disabled = (currentSlide === 0);
+    nextBtn.disabled = (currentSlide === slides.length - 1);
+  }
+</script>
+
+</body>
+</html>

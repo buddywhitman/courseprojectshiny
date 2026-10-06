@@ -1,0 +1,81 @@
+---
+title: "mtcars MPG Predictor App"
+subtitle: "Coursera Developing Data Products Pitch Presentation"
+author: "Buddy Whitman"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(datasets)
+library(ggplot2)
+```
+
+## Executive Summary & Overview
+
+### **The Problem & Solution**
+Vehicle fuel efficiency (MPG) depends on multiple physical and mechanical factors. Estimating expected fuel consumption helps drivers and buyers assess performance.
+
+- **Objective**: Provide an interactive tool to predict fuel efficiency based on vehicle specifications.
+- **Data Source**: 1974 *Motor Trend* US magazine dataset (`mtcars`).
+- **Interactive App**: Built with R Shiny, allowing users to manipulate sliders and radio buttons to predict MPG in real-time.
+
+---
+
+## The mtcars Dataset & Exploratory Analysis
+
+The `mtcars` dataset comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).
+
+```{r mtcars_summary}
+# Overview of key variables in mtcars
+summary(mtcars[, c("mpg", "hp", "wt", "cyl", "am")])
+```
+
+- Key predictors: **Horsepower (`hp`)**, **Weight (`wt`)**, **Cylinders (`cyl`)**, and **Transmission (`am`)**.
+
+---
+
+## Predictive Statistical Model
+
+We fit a multivariate linear model to calculate predicted MPG based on user inputs:
+
+```{r model_fit}
+# Fit multivariate linear regression model
+fit <- lm(mpg ~ hp + wt + factor(cyl) + factor(am), data = mtcars)
+coef(summary(fit))
+```
+
+- Higher horsepower and weight significantly decrease predicted MPG.
+- The model is calculated reactively inside `server.R` whenever input widgets change.
+
+---
+
+## Visualizing Model Performance
+
+Below is an embedded live plot demonstrating the relationship between Horsepower and MPG across different cylinder counts:
+
+```{r sample_plot, fig.height=3.8, fig.width=8}
+ggplot(mtcars, aes(x = hp, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray50", linetype = "dashed") +
+  theme_minimal() +
+  labs(title = "MPG vs Horsepower by Cylinder Count",
+       x = "Gross Horsepower (hp)", y = "Miles Per Gallon (mpg)", color = "Cylinders")
+```
+
+---
+
+## Shiny App Link & Repository
+
+### **Try the Interactive App & Access Code**
+
+- **Shiny Application URL**:  
+  [https://buddywhitman.shinyapps.io/courseprojectshiny/](https://buddywhitman.shinyapps.io/courseprojectshiny/)
+
+- **GitHub Code Repository**:  
+  [https://github.com/buddywhitman/courseprojectshiny](https://github.com/buddywhitman/courseprojectshiny)
+
+- **Key App Features**:
+  1. Interactive Sliders (Horsepower, Weight) & Radio Buttons (Cylinders, Transmission).
+  2. Dynamic calculation of predicted MPG with visual highlight on scatter plot.
+  3. Built-in documentation tab on the Shiny website itself.
